@@ -26,6 +26,8 @@ GEM
       thread_safe (~> 0.1)
       tzinfo (~> 0.3.37)
     arel (4.0.2)
+    bootstrap-sass (3.1.1.1)
+      sass (~> 3.2)
     builder (3.1.4)
     capybara (2.2.1)
       mime-types (>= 1.16)
@@ -194,6 +196,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  bootstrap-sass (= 3.1.1.1)
   capybara (= 2.2.1)
   childprocess (= 0.5.2)
   coffee-rails (~> 4.0.0)
@@ -209,6 +212,7 @@ DEPENDENCIES
   sdoc
   selenium-webdriver (= 2.41.0)
   spork-rails (= 4.0.0)
+  sprockets (= 2.11.0)
   sqlite3 (= 1.3.9)
   turbolinks
   uglifier (>= 1.3.0)

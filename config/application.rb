@@ -14,6 +14,7 @@ Bundler.require(:default, Rails.env)
 module MiniTwitterProject
   class Application < Rails::Application
     config.assets.precompile += %w(*.png *.jpg *.jpeg *.gif)
+    I18n.enforce_available_locales = true
     # Settings in config/environments/* take precedence over those specified here.
     # Application configuration should go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded.

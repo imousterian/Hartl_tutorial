@@ -13,15 +13,18 @@
 <body>
     <%= render 'layouts/header' %>
 
-
     <div class="container" role="main">
 
-        <div class="jumbotron">
+        <div class="container">
+            <% flash.each do |key, value| %>
+                <div class="alert alert-<%= key %>" > <%= value %></div>
+            <% end %>
             <%= yield %>
         </div>
 
         <%= link_to image_tag("rails.png", alt: "Rails"), 'http://rubyonrails.org/' %>
         <%= render 'layouts/footer' %>
+        <%= debug(params) if Rails.env.development? %>
 
     </div>
 

@@ -11,6 +11,7 @@ class UsersController < ApplicationController
   def create
     @user = User.new(user_params)
     if @user.save
+        sign_in @user
         # handle a successful save
         flash[:success] = "Welcome to the MiniTwitter App!"   # 'success' method comes from Bootstrap
         redirect_to @user

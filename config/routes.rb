@@ -2,6 +2,8 @@ MiniTwitterProject::Application.routes.draw do
 
 
   resources :users
+  resources :sessions, only: [:new, :create, :destroy] #since there is no need to show or edit sessions, the actions are restricted to new, create and destroy
+
   #get "users/new"
   match '/signup', to: 'users#new', via: 'get'
   root "static_pages#home"
@@ -9,6 +11,10 @@ MiniTwitterProject::Application.routes.draw do
   match '/about', to: "static_pages#about", via: 'get'
   match '/contact/', to: "static_pages#contact", via: 'get'
   match '/signup', to: "users#new", via: 'get'
+
+  match '/signin', to: 'sessions#new', via: 'get' # mapping signin route to acton 'new'
+  match '/signout', to: 'sessions#destroy', via: 'delete'
+
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

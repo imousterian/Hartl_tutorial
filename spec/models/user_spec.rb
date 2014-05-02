@@ -15,8 +15,18 @@ describe User do
   it {should respond_to(:password)}
   it {should respond_to(:password_confirmation)}
   it {should respond_to(:authenticate)}
+  it {should respond_to(:admin_md)} #for creatino of admin user types
 
   it {should be_valid}
+  it {should_not be_admin_md} # for creation of admin user types
+
+  describe "with admin attribute set to 'true' " do
+    before do
+        @user.save!
+        @user.toggle!(:admin_md) # toggle comes from Rails
+    end
+    it { should be_admin_md }
+  end
 
   describe "when name is not present" do
     before {@user.name = " "}

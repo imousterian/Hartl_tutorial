@@ -2,7 +2,12 @@ require 'spec_helper'
 
 describe "UserPages" do
 
-    subject {page }
+    subject { page }
+
+    # shared_examples_for "all user pages" do
+    #     # it {should have_selector('h1', text: heading)}
+    #     # it {should have_title(full_title(page_title))}
+    # end
 
     describe "index" do
         let(:user) { FactoryGirl.create(:user) }
@@ -40,6 +45,7 @@ describe "UserPages" do
                 end
 
                 it { should have_link('delete', href: user_path(User.first))}
+
                 it "should be able to delete another user" do
                     expect do
                         click_link('delete', match: :first) # match: :first tells Capybara to click just the first link
@@ -72,11 +78,12 @@ describe "UserPages" do
     end
 
     describe "with valid information" do
+
         before do
             fill_in "Name", with: "Example User"
             fill_in "Email", with: "user@example.com"
             fill_in "Password", with: "foobar"
-            fill_in "Confirmation", with: "foobar"
+            fill_in "Confirm Password", with: "foobar"
         end
 
         it "should create a user" do
@@ -94,8 +101,8 @@ describe "UserPages" do
             let(:user) {User.find_by(email: 'user@example.com')}
 
             it { should have_link('Sign out') }
-            it {should have_title(user.name)}
-            it {should have_selector('div.alert.alert-success', text: "Welcome")}
+            it { should have_title(user.name)}
+            it { should have_selector('div.alert.alert-success', text: "Welcome")}
         end
     end
 
@@ -148,6 +155,19 @@ describe "UserPages" do
         specify { expect(user.reload.name).to eq new_name }
         specify { expect(user.reload.email).to eq(new_email)}
     end
+
+    describe "forbidden attributes" do
+            let(:params) do
+                { user: {admin_md: true, password: user.password, password_confirmation: user.password}}
+            end
+
+            before do
+                sign_in user, no_capybara: true
+                patch user_path(user), params
+            end
+
+            specify { expect(user.reload).not_to be_admin_md }
+        end
   end
 
 end

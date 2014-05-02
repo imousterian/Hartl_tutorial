@@ -2,6 +2,7 @@ class UsersController < ApplicationController
     before_action :signed_in_user, only: [:index, :edit, :update, :destroy]
     before_action :correct_user, only: [:edit, :update]
     before_action :admin_md_user, only: :destroy
+    before_filter :signed_in_user_filter, only: [:new, :create]
 
     def index
         @users = User.paginate(page: params[:page])
@@ -16,8 +17,15 @@ class UsersController < ApplicationController
     end
 
     def destroy
-        User.find(params[:id]).destroy
-        flash[:success] = "User deleted."
+        # User.find(params[:id]).destroy
+        # flash[:success] = "User deleted."
+        user = User.find(params[:id])
+        if (current_user? user) && (current_user.admin_md?)
+            flash[:error] = "Can not delete admin account"
+        else
+            user.destroy
+            flash[:success] = "User deleted."
+        end
         redirect_to users_url
     end
 
@@ -25,7 +33,6 @@ class UsersController < ApplicationController
         @user = User.new(user_params)
         if @user.save
             sign_in @user
-        # handle a successful save
             flash[:success] = "Welcome to the MiniTwitter App!"   # 'success' method comes from Bootstrap
             redirect_to @user
         else
@@ -40,7 +47,6 @@ class UsersController < ApplicationController
   def update
     # @user = User.find(params[:id])
     if @user.update_attributes(user_params)
-        # handle a successful update
         flash[:success] = "Profile updated"
         redirect_to @user
     else
@@ -68,6 +74,10 @@ class UsersController < ApplicationController
 
     def correct_user
         @user = User.find(params[:id])
-        redirect_to(root_url) unless current_user?(@user)
+        redirect_to root_url unless current_user?(@user)
+    end
+
+    def signed_in_user_filter
+        redirect_to root_path, notice: "Already logged in" if signed_in?
     end
 end

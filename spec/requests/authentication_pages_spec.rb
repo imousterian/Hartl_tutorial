@@ -10,9 +10,10 @@ describe "AuthenticationPages" do
         it { should have_content('Sign in') }
         it { should have_title('Sign in') }
 
-    end
+    end # end of "signin page"
 
     describe "signin" do
+
         before { visit signin_path }
 
         describe "with invalid information" do
@@ -26,7 +27,7 @@ describe "AuthenticationPages" do
                 before { click_link "Home" }
                 it { should_not have_selector('div.alert.alert-error') }
             end
-        end
+        end # end of "with invalid information"
 
         describe "with valid information" do
             let(:user) { FactoryGirl.create(:user) }
@@ -48,11 +49,41 @@ describe "AuthenticationPages" do
 
         end
 
-    end
+        describe "for signed in users" do
+
+            let(:user) { FactoryGirl.create(:user)}
+            let(:new_user) { FactoryGirl.attributes_for(:user)}
+
+            before { sign_in user, no_capybara: true }
+
+            describe "using a 'new' action" do
+                before { get new_user_path }
+                specify { response.should redirect_to(root_path)}
+            end
+
+            describe "using a 'create' action" do
+                before { post users_path (new_user) }
+                specify { response.should redirect_to(root_path)}
+            end
+
+        end # end of "for signed in users"
+
+    end # end of "signin"
 
     describe "authorization" do
+
+
+
         describe "for non-signed-in users" do
+
             let(:user) { FactoryGirl.create(:user) }
+
+            describe "it should not have a profile and settings page" do
+                before {visit user_path(user)}
+                it {should have_link('Sign in', href: signin_path)}
+                it {should_not have_link('Profile')}
+                it {should_not have_link('Settings')}
+            end
 
             describe "when attempting to visit a protected page" do
                 before do
@@ -66,8 +97,22 @@ describe "AuthenticationPages" do
                     it "should render the desired protected page" do
                         expect(page).to have_title('Edit user')
                     end
+
+                    describe "when signing in again" do
+                        before do
+                            click_link "Sign out"
+                            visit signin_path
+                            fill_in "Email", with: user.email
+                            fill_in "Password", with: user.password
+                            click_button "Sign in"
+                        end
+
+                        it "should render the default (profile) page" do
+                            expect(page).to have_title(user.name)
+                        end
+                    end # end of "when signing in again"
                 end
-            end
+            end # end of "when attempting to visit a protected page"
 
             describe "in the Users controller" do
                 describe "visiting the edit page" do
@@ -84,8 +129,9 @@ describe "AuthenticationPages" do
                     before { visit users_path }
                     it { should have_title('Sign in')}
                 end
-            end
-        end
+            end # end of "in the Users controller"
+
+        end # end as "for non-signed-in users"
 
         describe "as wrong user" do
             let (:user) { FactoryGirl.create(:user) }
@@ -102,18 +148,29 @@ describe "AuthenticationPages" do
                 before { patch user_path(wrong_user)}
                 specify { expect(response).to redirect_to(root_url)}
             end
-        end
+        end # end of "as wrong user"
 
         describe "as non-admin user" do
             let (:user) {FactoryGirl.create(:user)}
             let(:non_admin_md)  {FactoryGirl.create(:user)}
 
             before { sign_in non_admin_md, no_capybara: true}
+
             describe "submitting a DELETE request to the Users#destroy action" do
                 before { delete user_path(user)}
                 specify { expect(response).to redirect_to(root_url)}
             end
-        end
-    end
+        end # end of "as non-admin user"
 
-end
+        describe "as admin user" do
+            let(:admin_md) { FactoryGirl.create(:admin_md)}
+            before { sign_in admin_md}
+
+            it "cannot delete admin user by submitting DELETE request to Users#destroy action" do
+                expect { delete user_path(admin_md)  }.not_to change(User, :count).by(-1)
+            end
+        end # end of "as admin user"
+
+    end # end of "authorization"
+
+end # end of "authorizationpages"

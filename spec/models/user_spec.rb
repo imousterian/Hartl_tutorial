@@ -16,6 +16,7 @@ describe User do
   it {should respond_to(:password_confirmation)}
   it {should respond_to(:authenticate)}
   it {should respond_to(:admin_md)} #for creatino of admin user types
+  it {should respond_to(:microposts)} #testing an association between user and microposts
 
   it {should be_valid}
   it {should_not be_admin_md} # for creation of admin user types
@@ -87,48 +88,80 @@ describe User do
 
   end
 
-  describe "return value of authenticate method" do
-    before { @user.save }  #first, save the user to the DB so we can find it later
+    describe "return value of authenticate method" do
+        before { @user.save }  #first, save the user to the DB so we can find it later
 
-    let (:found_user) {User.find_by(email: @user.email)} #Repect uses 'let' to create local variables using : notation
+        let (:found_user) {User.find_by(email: @user.email)} #Repect uses 'let' to create local variables using : notation
 
-    describe "with valid password" do
-        it {should eq found_user.authenticate(@user.password)} #eq is the same as ==
+        describe "with valid password" do
+            it {should eq found_user.authenticate(@user.password)} #eq is the same as ==
+        end
+
+        describe "with invalid password" do
+            let (:user_for_invalid_password) {found_user.authenticate("invalid")}
+            it {should_not eq user_for_invalid_password}
+            specify {expect(user_for_invalid_password).to be_false}
+        end
+
     end
 
-    describe "with invalid password" do
-        let (:user_for_invalid_password) {found_user.authenticate("invalid")}
-        it {should_not eq user_for_invalid_password}
-        specify {expect(user_for_invalid_password).to be_false}
+    describe "with a password that's too short" do
+        before {@user.password = @user.password_confirmation = "a" * 5}
+        it {should be_invalid}
+
     end
 
-  end
+    describe "email address with mixed case" do
+        let(:mixed_case_email) {"Foo@ExaMPle.CoM"}
 
-  describe "with a password that's too short" do
-    before {@user.password = @user.password_confirmation = "a" * 5}
-    it {should be_invalid}
+        it "should be saved as all locwer-case" do
+            @user.email = mixed_case_email
+            @user.save
+            expect(@user.reload.email).to eq mixed_case_email.downcase
+        end
 
-  end
-
-  describe "email address with mixed case" do
-    let(:mixed_case_email) {"Foo@ExaMPle.CoM"}
-
-    it "should be saved as all locwer-case" do
-        @user.email = mixed_case_email
-        @user.save
-        expect(@user.reload.email).to eq mixed_case_email.downcase
     end
 
-  end
-
-  it { should respond_to(:password_confirmation) }
-  it { should respond_to(:remember_token) }
-  it { should respond_to(:authenticate) }
+    it { should respond_to(:password_confirmation) }
+    it { should respond_to(:remember_token) }
+    it { should respond_to(:authenticate) }
 
     describe "remember token" do
         before { @user.save }
         its(:remember_token) { should_not be_blank }
     end
+
+    describe "microposts associations" do
+        before { @user.save }
+        # let! forces the corresponding variables to come into existence immediately,
+        # so that the timestamps are in the right order and the @user.microposts isn't ready.
+        # let, however, is a _lazy_ variable, meaning they come into existence only when referenced.
+
+        let!(:older_micropost) do
+            FactoryGirl.create(:micropost, user: @user, created_at: 1.day.ago)
+        end
+
+        let!(:newer_micropost) do
+            FactoryGirl.create(:micropost, user: @user, created_at: 1.hour.ago)
+        end
+
+        it "should have the right microposts in the right order" do
+            expect(@user.microposts.to_a).to eq [newer_micropost, older_micropost]
+        end
+
+        it "should destroy associated microposts" do
+            microposts = @user.microposts.to_a # this call (to_a) effectively makes a copy of the micropost (i.e., captures them in a local variable)
+            @user.destroy
+            expect(microposts).not_to be_empty # after having destroyed the user, the test checks that the local variable is not empty. This is a safety check to catch any errors should the to_a ever be accidently removed
+            # without the to_a, destriying the user will destroy the posts in the microsoft variable, and the loop below will not test properly.
+            microposts.each do |micropost|
+                # check that a micropost with a given id does not exist in a DB
+                expect(Micropost.where(id: micropost.id)).to be_empty
+            end
+        end
+    end
+
+
 
 
 end

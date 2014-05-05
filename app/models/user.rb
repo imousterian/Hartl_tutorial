@@ -1,11 +1,15 @@
 class User < ActiveRecord::Base
 
+    has_many :microposts, dependent: :destroy #the option dependent: :destroy arranges for the dependent microposts (those belonging to a given user) to be destroyed when the user is destroyed
+
      #before_save {self.email = email.downcase} #using before_save callback to ensure email is in downcase format
                                                 # before saving to database
 
     #can be re-written as
      before_save {email.downcase!}
      before_create :create_remember_token
+
+
 
      validates :name, presence: true, length: { maximum: 50 }
 

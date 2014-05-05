@@ -22,6 +22,11 @@ FactoryGirl.define do
             admin_md true
         end
     end
+
+    factory :micropost do
+        content "Lorem ipsum"
+        user
+    end
 end
 
 

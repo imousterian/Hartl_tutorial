@@ -25,7 +25,6 @@ describe "MicropostPages" do
                 page.should have_selector('li##{item.id}', text: item.content)
             end
         end
-
     end
 
 

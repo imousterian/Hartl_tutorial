@@ -21,7 +21,7 @@ describe "Static pages" do
         it_should_behave_like "all static pages"
         it {should_not have_title ('| Home') }
 
-        describe "fir signed-in users" do
+        describe "for signed-in users" do
 
             let(:user) { FactoryGirl.create(:user) }
             before do
@@ -37,7 +37,11 @@ describe "Static pages" do
                     expect(page).to have_selector("li##{item.id}", text: item.content)
                 end
             end
-        end
+
+            it { should have_selector('section h1', text: user.name )}
+            it { should have_content('micropost'.pluralize(user.microposts.count))}
+
+        end # end of sign-in users
 
 
     end

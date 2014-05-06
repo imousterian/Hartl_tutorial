@@ -128,7 +128,7 @@ describe "UserPages" do
         it {should have_title(user.name)}
 
         describe "microposts" do
-            it { should have_content(m1).content }
+            it { should have_content(m1.content) }
             it { should have_content(m2.content) }
             it { should have_content(user.microposts.count) } # this line counts the microposts within the DB with the given user_id
         end

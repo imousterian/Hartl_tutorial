@@ -131,6 +131,20 @@ describe "AuthenticationPages" do
                 end
             end # end of "in the Users controller"
 
+            describe "in the Microposts controller" do
+
+                describe "submitting to the create action" do
+                    before { post microposts_path } # a non-signed-in user is redirected upon submitting a POST request to /microposts, which hits the 'create' action
+                    specify { expect(response).to redirect_to(signin_path)}
+                end # end of the "submitting to the create action"
+
+                describe "submitting to the destroy action" do
+                    before { delete micropost_path(FactoryGirl.create(:micropost)) } # hits the destroy action
+                    specify { expect(response).to redirect_to(signin_path) }
+                end # end of "submitting to the destroy action"
+
+            end # end of the in the Microposts controller
+
         end # end as "for non-signed-in users"
 
         describe "as wrong user" do

@@ -1,6 +1,7 @@
 class MicropostsController < ApplicationController
 
-    before_action :signed_in_user
+    before_action :signed_in_user, only: [:create, :destroy]
+    before_action :correct_user, only: :destroy
 
 
     def create
@@ -15,13 +16,19 @@ class MicropostsController < ApplicationController
     end
 
     def destroy
-
+        @micropost.destroy
+        redirect_to root_url
     end
 
     private
 
         def micropost_params
             params.require(:micropost).permit(:content)
+        end
+
+        def correct_user
+            @micropost = current_user.microposts.find_by(id: params[:id]) # this finds microposts through the association; this is a good security practice as explained in http://www.rubyfocus.biz/blog/2011/06/15/access_control_101_in_rails_and_the_citibank-hack.html
+            redirect_to root_url if @micropost.nil?
         end
 
 end

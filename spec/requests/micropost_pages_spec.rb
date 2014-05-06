@@ -5,21 +5,29 @@ describe "MicropostPages" do
     subject { page }
 
     let(:user) { FactoryGirl.create(:user) }
+
     before { sign_in user }
 
-    # describe "micropost pagination" do
-    #     before(:all) { 50.times {FactoryGirl.create(:micropost, user: user)}}
-    #     # before(:all) { 30.times {FactoryGirl.create(:user)}}
-    #     after(:all) { Micropost.delete_all}
+    describe "micropost pagination" do
 
-    #     it { should have_selector('div.pagination')}
+        it "should paginate the feed" do
 
-    #     it "should list each micropost" do
-    #         Micropost.paginate(page: 1).each do |micropost|
-    #             expect(page).to have_selector('li', title: micropost.content)
-    #         end
-    #     end
-    # end
+            50.times {FactoryGirl.create(:micropost, user: user)}
+            visit root_path
+            page.should have_content("Micropost Feed")
+            page.should have_selector('div.pagination')
+
+        end
+
+        it "should list each micropost" do
+            Micropost.paginate(page: 1).each do |item|
+                # expect(page).to have_selector('li', text: item.content)
+                page.should have_selector('li##{item.id}', text: item.content)
+            end
+        end
+
+    end
+
 
     describe "micropost creation" do
         before { visit root_path }
@@ -59,5 +67,5 @@ describe "MicropostPages" do
 
         end # end of as correct user
     end # end of micropost destruction
-
+#end # end of test
 end

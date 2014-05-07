@@ -24,6 +24,8 @@ describe "Static pages" do
         describe "for signed-in users" do
 
             let(:user) { FactoryGirl.create(:user) }
+
+
             before do
                 FactoryGirl.create(:micropost, user: user, content: "Lorem ipsum")
                 FactoryGirl.create(:micropost, user: user, content: "Dolor sit amet")
@@ -40,6 +42,18 @@ describe "Static pages" do
 
             it { should have_selector('section h1', text: user.name )}
             it { should have_content('micropost'.pluralize(user.microposts.count))}
+
+            describe "when visiting another user's page" do
+
+                let(:another_user) { FactoryGirl.create(:user) }
+
+                before do
+                    FactoryGirl.create(:micropost, user: another_user, content: "Dolor sit amet Lambda")
+                    visit user_path(another_user)
+                end
+
+                it { should_not have_link('delete', href: user_path(another_user)) }
+            end
 
         end # end of sign-in users
 

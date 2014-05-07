@@ -15,7 +15,7 @@ describe "MicropostPages" do
             50.times {FactoryGirl.create(:micropost, user: user)}
             visit root_path
             page.should have_content("Micropost Feed")
-            page.should have_selector('div.pagination')
+            expect(page).to have_selector('div.pagination')
 
         end
 
@@ -65,6 +65,15 @@ describe "MicropostPages" do
             end
 
         end # end of as correct user
+
+        # describe "as incorrect user" do
+
+        #     before { visit root_path }
+
+        #     it "should not delete a micropost" do
+
+        #     end
+        # end
     end # end of micropost destruction
 #end # end of test
 end

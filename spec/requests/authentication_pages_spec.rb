@@ -162,6 +162,7 @@ describe "AuthenticationPages" do
                 before { patch user_path(wrong_user)}
                 specify { expect(response).to redirect_to(root_url)}
             end
+
         end # end of "as wrong user"
 
         describe "as non-admin user" do

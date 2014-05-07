@@ -65,15 +65,6 @@ describe "MicropostPages" do
             end
 
         end # end of as correct user
-
-        # describe "as incorrect user" do
-
-        #     before { visit root_path }
-
-        #     it "should not delete a micropost" do
-
-        #     end
-        # end
     end # end of micropost destruction
 #end # end of test
 end

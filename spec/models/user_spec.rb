@@ -18,6 +18,7 @@ describe User do
     it {should respond_to(:admin_md)} #for creatino of admin user types
     it {should respond_to(:microposts)} #testing an association between user and microposts
     it {should respond_to(:feed)}
+    it {should respond_to(:relationships)}
 
     it {should be_valid}
     it {should_not be_admin_md} # for creation of admin user types

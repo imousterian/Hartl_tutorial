@@ -4,6 +4,12 @@ class User < ActiveRecord::Base
     has_many :relationships, foreign_key: "follower_id", dependent: :destroy
      #before_save {self.email = email.downcase} #using before_save callback to ensure email is in downcase format
                                                 # before saving to database
+    has_many :followed_users, through: :relationships, source: :followed
+
+    has_many :reverse_relationships, foreign_key: "followed_id",
+                                        class_name: "Relationship",
+                                        dependent: :destroy
+    has_many :followers, through: :reverse_relationships, source: :follower
 
     #can be re-written as
      before_save {email.downcase!}
@@ -36,6 +42,18 @@ class User < ActiveRecord::Base
 
      def feed
         Micropost.where("user_id = ?", id) # the ? mark ensures that id is properly escaped before being included in the underlying SQL query, thus avoiding malicious SQL injection
+     end
+
+     def following?(other_user)
+        relationships.find_by(followed_id: other_user.id)
+     end
+
+     def follow!(other_user)
+        relationships.create!(followed_id: other_user.id)
+     end
+
+     def unfollow!(other_user)
+        relationships.find_by(followed_id: other_user.id).destroy
      end
 
      private

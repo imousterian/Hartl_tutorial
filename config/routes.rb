@@ -1,9 +1,14 @@
 MiniTwitterProject::Application.routes.draw do
 
 
-  resources :users
+  resources :users do
+    member do
+        get :following, :followers
+    end
+  end
   resources :sessions, only: [:new, :create, :destroy] #since there is no need to show or edit sessions, the actions are restricted to new, create and destroy
   resources :microposts, only: [:create, :destroy]
+  resources :relationships, only: [:create, :destroy]
 
   #get "users/new"
   match '/signup', to: 'users#new', via: 'get'

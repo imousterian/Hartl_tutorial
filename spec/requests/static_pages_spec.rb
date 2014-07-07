@@ -25,7 +25,6 @@ describe "Static pages" do
 
             let(:user) { FactoryGirl.create(:user) }
 
-
             before do
                 FactoryGirl.create(:micropost, user: user, content: "Lorem ipsum")
                 FactoryGirl.create(:micropost, user: user, content: "Dolor sit amet")

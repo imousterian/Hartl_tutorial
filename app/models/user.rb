@@ -41,7 +41,7 @@ class User < ActiveRecord::Base
      end
 
      def feed
-        Micropost.where("user_id = ?", id) # the ? mark ensures that id is properly escaped before being included in the underlying SQL query, thus avoiding malicious SQL injection
+        Micropost.from_users_followed_by(self)
      end
 
      def following?(other_user)
